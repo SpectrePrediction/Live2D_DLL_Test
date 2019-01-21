@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using OpenCvSharp;
 using System.Threading;
+using Tesseract;
 
 namespace LeekCutter
 {
@@ -202,12 +203,13 @@ namespace LeekCutter
         public const byte vbKeyF12 = 0x7B;  //F12 键
         #endregion
 
-        Mat GetWindowFromTitle(String IN)
+        Bitmap GetWindowFromTitle(String IN)
         {
             Mat m = new Mat();
             IntPtr Ptr = new IntPtr();
             RECT R = new RECT();
             Process[] localByName = Process.GetProcessesByName(IN);
+            Bitmap b = new Bitmap(10,10);
             if (localByName.Length > 0)
             {
                 Ptr = localByName[0].MainWindowHandle;
@@ -215,9 +217,9 @@ namespace LeekCutter
                 APIMethod.GetWindowRect(Ptr, out R);
                 if(R.Right == R.Left|| R.Bottom == R.Top)
                 {
-                    return m;
+                    return b;
                 }
-                Bitmap b = new Bitmap(R.Right - R.Left, R.Bottom - R.Top);
+                b = new Bitmap(R.Right - R.Left, R.Bottom - R.Top);
                 IntPtr hscrdc = APIMethod.GetWindowDC(Ptr);
                 IntPtr hmemdc = APIMethod.CreateCompatibleDC(hscrdc);
                 IntPtr hbitmap = APIMethod.CreateCompatibleBitmap(hscrdc, R.Right - R.Left, R.Bottom - R.Top);
@@ -230,7 +232,7 @@ namespace LeekCutter
                 #endregion
                 m = OpenCvSharp.Extensions.BitmapConverter.ToMat(b);
             }
-            return m;
+            return b;
         }
 
         void TypingTest(String IN)
@@ -255,20 +257,29 @@ namespace LeekCutter
             Console.WriteLine(Ptr.ToString("X"));
         }
 
+        void OCR(Mat m)
+        {
 
+        }
         static void Main(string[] args)
         {
-            Program P = new Program();
+            TesseractEngine ocr = new TesseractEngine("./tessdata", "chi_sim");
+            Program Pr = new Program();
             while (true)
             {
-                Mat m = P.GetWindowFromTitle("notepad");
-                if (m.Width > 0 && m.Height > 0)
+                Bitmap b = Pr.GetWindowFromTitle("mspaint");
+                if (b.Width > 0 && b.Height > 0)
                 {
-                    using (new Window("NotePad", m))
+                    using (new Window("Output", OpenCvSharp.Extensions.BitmapConverter.ToMat(b)))
                     {
                         Cv2.WaitKey(100);
                     }
-
+                    Bitmap bitmap24 = new Bitmap(b.Width, b.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                    Graphics g = Graphics.FromImage(bitmap24);
+                    g.DrawImageUnscaled(b, 0, 0);
+                    Page p = ocr.Process(bitmap24);
+                    Console.WriteLine(p.GetText());
+                    p.Dispose();
                 }
 
             }
