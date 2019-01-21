@@ -270,15 +270,21 @@ namespace LeekCutter
                 Bitmap b = Pr.GetWindowFromTitle("mspaint");
                 if (b.Width > 0 && b.Height > 0)
                 {
-                    using (new Window("Output", OpenCvSharp.Extensions.BitmapConverter.ToMat(b)))
-                    {
-                        Cv2.WaitKey(100);
-                    }
+                    Mat element = Cv2.GetStructuringElement(MorphShapes.Rect, new OpenCvSharp.Size(7, 7));
+                    Mat m = OpenCvSharp.Extensions.BitmapConverter.ToMat(b);
+                    Cv2.Erode(m, m, element);
+                    Cv2.Dilate(m, m, element);
+                    b = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(m);
                     Bitmap bitmap24 = new Bitmap(b.Width, b.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                     Graphics g = Graphics.FromImage(bitmap24);
                     g.DrawImageUnscaled(b, 0, 0);
                     Page p = ocr.Process(bitmap24);
-                    Console.WriteLine(p.GetText());
+                    using (new Window("Output", OpenCvSharp.Extensions.BitmapConverter.ToMat(bitmap24)))
+                    {
+                        Cv2.WaitKey(100);
+                    }
+                    String t = p.GetText();
+                    Console.WriteLine(t);
                     p.Dispose();
                 }
 
