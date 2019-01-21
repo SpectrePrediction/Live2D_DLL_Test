@@ -213,6 +213,10 @@ namespace LeekCutter
                 Ptr = localByName[0].MainWindowHandle;
                 #region getBitmap
                 APIMethod.GetWindowRect(Ptr, out R);
+                if(R.Right == R.Left|| R.Bottom == R.Top)
+                {
+                    return m;
+                }
                 Bitmap b = new Bitmap(R.Right - R.Left, R.Bottom - R.Top);
                 IntPtr hscrdc = APIMethod.GetWindowDC(Ptr);
                 IntPtr hmemdc = APIMethod.CreateCompatibleDC(hscrdc);
@@ -251,12 +255,22 @@ namespace LeekCutter
             Console.WriteLine(Ptr.ToString("X"));
         }
 
+
         static void Main(string[] args)
         {
             Program P = new Program();
             while (true)
             {
-                P.CursorTest();
+                Mat m = P.GetWindowFromTitle("notepad");
+                if (m.Width > 0 && m.Height > 0)
+                {
+                    using (new Window("NotePad", m))
+                    {
+                        Cv2.WaitKey(100);
+                    }
+
+                }
+
             }
 
         }
