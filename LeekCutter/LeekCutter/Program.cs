@@ -11,8 +11,8 @@ namespace LeekCutter
 {
     public struct POINT
     {
-        int x;
-        int y;
+        public int x;
+        public int y;
     }
     public struct RECT
     {
@@ -137,6 +137,7 @@ namespace LeekCutter
     }
     class Program
     {
+        Thread MainThr;
         #region bVk参数 常量定义
         public const byte vbKeyLButton = 0x1;    // 鼠标左键
         public const byte vbKeyRButton = 0x2;    // 鼠标右键
@@ -242,7 +243,6 @@ namespace LeekCutter
         public const byte vbKeyF11 = 0x7A;  //F11 键
         public const byte vbKeyF12 = 0x7B;  //F12 键
         #endregion
-
         Bitmap GetWindowFromTitle(String IN)
         {
             Mat m = new Mat();
@@ -327,11 +327,25 @@ namespace LeekCutter
         {
 
         }
+        void L2D_INIT()
+        {
+            APIMethod.Live2DStart(MainThr.ManagedThreadId);
+        }
         static void Main(string[] args)
         {
-            APIMethod.CreateWin();
-            int pid = Process.GetCurrentProcess().Id;
-            APIMethod.Live2DStart(pid);
+            Program Pr = new Program();
+            Pr.MainThr = new Thread(Pr.L2D_INIT);
+            Pr.MainThr.Start();
+            Console.ReadKey();
+            while (true)
+            {
+                POINT POI = APIMethod.GetCursorPos();
+                float x = ((float)POI.x - 682) * 2 / 683;
+                float y = (383 - (float)POI.y) * 2 / 384;
+                Console.WriteLine(x + "   " + y);
+                APIMethod.SetFaceDirection(Pr.MainThr.ManagedThreadId, x, y, 0, 0);
+                APIMethod.SetEyeBallDirection(Pr.MainThr.ManagedThreadId, x, y, 0);
+            }
         }
     }
 }
