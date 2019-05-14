@@ -5,6 +5,7 @@ using System.Drawing;
 using OpenCvSharp;
 using System.Threading;
 using Tesseract;
+using System.Text;
 
 namespace LeekCutter
 {
@@ -22,6 +23,45 @@ namespace LeekCutter
     }
     public static class APIMethod
     {
+        [DllImport("Live2D.dll")]
+        public static extern bool CreateWin();
+
+        [DllImport("Live2D.dll")]
+        public static extern bool Live2DStart(int tid);
+
+        [DllImport("Live2D.dll")]
+        public static extern bool Live2DAbort(int hinst);
+
+        [DllImport("Live2D.dll")]
+        public static extern bool SetExpression(int hinst, string expid, int index);
+
+        [DllImport("Live2D.dll")]
+        public static extern bool StartMotion(int hinst, string motiontype, int motionindex, int priority, int index);
+
+        [DllImport("Live2D.dll")]
+        public static extern int AddModel(int hinst, string path);
+
+        [DllImport("Live2D.dll", EntryPoint = "RemoveModels")]
+        public static extern bool RemoveModel(int hinst);
+
+        [DllImport("Live2D.dll")]
+        public static extern bool GetModelInfo(int hinst, int index, StringBuilder info);
+
+        [DllImport("Live2D.dll")]
+        public static extern bool SetEyeBallDirection(int hinst, float x, float y, int index);
+
+        [DllImport("Live2D.dll")]
+        public static extern bool SetFaceDirection(int hinst, float x, float y, float z, int index);
+
+        [DllImport("Live2D.dll")]
+        public static extern bool SetBodyDirection(int hinst, float x, int index);
+
+        [DllImport("Live2D.dll")]
+        public static extern bool SetViewDepth(int hinst, int x, int y, int depth);
+
+        [DllImport("Live2D.dll", CharSet = CharSet.Unicode)]
+        public static extern bool ShowMessage(int hinst, int x, int y, int width, int height, string text, int fontHeight, int fontWidth, int fontWeight, bool italic, string family, uint color);
+
         [DllImport("user32.dll")]
         static extern IntPtr WindowFromPoint(POINT Point);
 
@@ -256,13 +296,7 @@ namespace LeekCutter
             IntPtr Ptr = APIMethod.WindowFromPoint();
             Console.WriteLine(Ptr.ToString("X"));
         }
-
-        void OCR(Mat m)
-        {
-
-        }
-        static void Main(string[] args)
-        {
+        void AAC() {
             TesseractEngine ocr = new TesseractEngine("./tessdata", "chi_sim");
             Program Pr = new Program();
             while (true)
@@ -287,9 +321,17 @@ namespace LeekCutter
                     Console.WriteLine(t);
                     p.Dispose();
                 }
-
             }
+        }
+        void OCR(Mat m)
+        {
 
+        }
+        static void Main(string[] args)
+        {
+            APIMethod.CreateWin();
+            int pid = Process.GetCurrentProcess().Id;
+            APIMethod.Live2DStart(pid);
         }
     }
 }
