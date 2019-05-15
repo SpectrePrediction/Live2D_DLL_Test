@@ -1,2 +1,2 @@
-# AntiAntiCheater
-Use simulated keyboard and CV to handle game automation instead of manipulating stack memory
+# Live2D.dll calling verification
+Previous AAC project modified for testing Live2D.dll 
