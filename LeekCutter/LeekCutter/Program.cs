@@ -329,7 +329,7 @@ namespace LeekCutter
         }
         void L2D_INIT()
         {
-            APIMethod.Live2DStart(MainThr.ManagedThreadId);
+            APIMethod.Live2DStart(this.MainThr.ManagedThreadId);
         }
         static void Main(string[] args)
         {
