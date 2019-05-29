@@ -10,8 +10,8 @@ namespace LeekCutter
 {
     public struct POINT
     {
-        int x;
-        int y;
+        public int x;
+        public int y;
     }
     public struct RECT
     {
@@ -22,6 +22,9 @@ namespace LeekCutter
     }
     public static class APIMethod
     {
+        [DllImport("user32.dll")]
+        public static extern int SetCursorPos(int x, int y);
+
         [DllImport("user32.dll")]
         static extern IntPtr WindowFromPoint(POINT Point);
 
@@ -257,17 +260,12 @@ namespace LeekCutter
             Console.WriteLine(Ptr.ToString("X"));
         }
 
-        void OCR(Mat m)
-        {
-
-        }
-        static void Main(string[] args)
+        void OCR()
         {
             TesseractEngine ocr = new TesseractEngine("./tessdata", "chi_sim");
-            Program Pr = new Program();
             while (true)
             {
-                Bitmap b = Pr.GetWindowFromTitle("mspaint");
+                Bitmap b = GetWindowFromTitle("mspaint");
                 if (b.Width > 0 && b.Height > 0)
                 {
                     Mat element = Cv2.GetStructuringElement(MorphShapes.Rect, new OpenCvSharp.Size(7, 7));
@@ -287,9 +285,11 @@ namespace LeekCutter
                     Console.WriteLine(t);
                     p.Dispose();
                 }
-
             }
-
+        }
+        static void Main(string[] args)
+        {
+            
         }
     }
 }
