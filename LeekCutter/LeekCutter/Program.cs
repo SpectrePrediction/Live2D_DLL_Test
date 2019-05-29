@@ -81,6 +81,9 @@ namespace LeekCutter
         [DllImport("user32.dll")]
         public static extern bool SetForegroundWindow(IntPtr hWnd);
 
+        [DllImport("user32.dll")]
+        public static extern int mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
+
         public static POINT GetCursorPos()
         {
             POINT p=new LeekCutter.POINT();
@@ -204,6 +207,24 @@ namespace LeekCutter
         public const byte vbKeyF10 = 0x79;  //F10 键
         public const byte vbKeyF11 = 0x7A;  //F11 键
         public const byte vbKeyF12 = 0x7B;  //F12 键
+
+        //移动鼠标 
+        public const int MOUSEEVENTF_MOVE = 0x0001;
+        //模拟鼠标左键按下 
+        public const int MOUSEEVENTF_LEFTDOWN = 0x0002;
+        //模拟鼠标左键抬起 
+        public const int MOUSEEVENTF_LEFTUP = 0x0004;
+        //模拟鼠标右键按下 
+        public const int MOUSEEVENTF_RIGHTDOWN = 0x0008;
+        //模拟鼠标右键抬起 
+        public const int MOUSEEVENTF_RIGHTUP = 0x0010;
+        //模拟鼠标中键按下 
+        public const int MOUSEEVENTF_MIDDLEDOWN = 0x0020;
+        //模拟鼠标中键抬起 
+        public const int MOUSEEVENTF_MIDDLEUP = 0x0040;
+        //标示是否采用绝对坐标 
+        public const int MOUSEEVENTF_ABSOLUTE = 0x8000;
+
         #endregion
 
         Bitmap GetWindowFromTitle(String IN)
@@ -254,10 +275,15 @@ namespace LeekCutter
                 APIMethod.keybd_event(vbKeyBack, 0, 2, 0);
             }
         }
-        void CursorTest()
+        static void CursorTest()
         {
-            IntPtr Ptr = APIMethod.WindowFromPoint();
-            Console.WriteLine(Ptr.ToString("X"));
+            POINT P = APIMethod.GetCursorPos();
+            while (true)
+            {
+                IntPtr Ptr = APIMethod.WindowFromPoint();
+                P = APIMethod.GetCursorPos();
+                Console.WriteLine(Ptr.ToString("X")+" "+P.x.ToString()+" "+P.y.ToString());
+            }
         }
 
         void OCR()
@@ -287,9 +313,36 @@ namespace LeekCutter
                 }
             }
         }
+
+        static void MoveAndClick(int x,int y)
+        {
+            APIMethod.SetCursorPos(x, y);
+            APIMethod.mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+        }
         static void Main(string[] args)
         {
-            
+            Thread T = new Thread(new ThreadStart(Program.CursorTest));
+            T.Start();
+            Thread.Sleep(10000);
+            Program.MoveAndClick(886, 246);
+            Thread.Sleep(10000);
+            Program.MoveAndClick(514, 506);
+            Thread.Sleep(10000);
+            Program.MoveAndClick(511, 339);
+            Thread.Sleep(10000);
+            for(int i = 0; i < 3; i++)
+            {
+                Program.MoveAndClick(644, 436);
+                Thread.Sleep(10000);
+                //Program.MoveAndClick(985, 471);
+                //Thread.Sleep(10000);
+                Program.MoveAndClick(981, 510);
+                Thread.Sleep(10000);
+                Program.MoveAndClick(984, 424);
+                Thread.Sleep(2 * 60 * 1000);
+                Program.MoveAndClick(886, 246);
+
+            }
         }
     }
 }
