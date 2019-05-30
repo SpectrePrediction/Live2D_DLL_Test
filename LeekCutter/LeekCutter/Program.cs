@@ -358,8 +358,11 @@ namespace LeekCutter
         }
         static void Main(string[] args)
         {
-
-            Program.Arknights(886,246);
+            Console.WriteLine("x:");
+            int.TryParse(Console.ReadLine(), out int x);
+            Console.WriteLine("y:");
+            int.TryParse(Console.ReadLine(), out int y);
+            Program.Arknights(x,y);
         }
     }
 }
