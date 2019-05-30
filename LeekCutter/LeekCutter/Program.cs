@@ -319,30 +319,47 @@ namespace LeekCutter
             APIMethod.SetCursorPos(x, y);
             APIMethod.mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
         }
-        static void Main(string[] args)
+        static void Arknights(int x,int y)
         {
-            Thread T = new Thread(new ThreadStart(Program.CursorTest));
-            T.Start();
             Thread.Sleep(10000);
-            Program.MoveAndClick(886, 246);
+            Program.MoveAndClick(x, y);
+            x -= 372;
+            y += 260;
             Thread.Sleep(10000);
-            Program.MoveAndClick(514, 506);
+            Program.MoveAndClick(x, y);
+            x -= 3;
+            y -= 167;
             Thread.Sleep(10000);
-            Program.MoveAndClick(511, 339);
+            Program.MoveAndClick(x, y);
+            x += 133;
+            y += 97;
             Thread.Sleep(10000);
-            for(int i = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++)
             {
-                Program.MoveAndClick(644, 436);
+                Program.MoveAndClick(x, y);
+                x += 337;
+                y += 74;
                 Thread.Sleep(10000);
+                //for applying designated mission
                 //Program.MoveAndClick(985, 471);
                 //Thread.Sleep(10000);
-                Program.MoveAndClick(981, 510);
+                Program.MoveAndClick(x, y);
+                x += 3;
+                y -= 86;
                 Thread.Sleep(10000);
-                Program.MoveAndClick(984, 424);
+                Program.MoveAndClick(x, y);
+                x -= 98;
+                y -= 178;
                 Thread.Sleep(2 * 60 * 1000);
-                Program.MoveAndClick(886, 246);
-
+                Program.MoveAndClick(x, y);
+                x -= 242;
+                y += 190;
             }
+        }
+        static void Main(string[] args)
+        {
+
+            Program.Arknights(886,246);
         }
     }
 }
