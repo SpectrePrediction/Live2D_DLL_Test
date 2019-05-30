@@ -259,6 +259,13 @@ namespace LeekCutter
             return b;
         }
 
+        public int x, y;
+        public int[] dx;
+        public int[] dy;
+        public int[] delay;
+
+        public Random R;
+
         void TypingTest(String IN)
         {
             IntPtr Ptr = new IntPtr();
@@ -314,55 +321,64 @@ namespace LeekCutter
             }
         }
 
+        static void RMAndClick(int x,int y,Random R)
+        {
+            x += R.Next(-2, 2);
+            y -= R.Next(-2, 2);
+            MoveAndClick(x, y);
+        }
+
         static void MoveAndClick(int x,int y)
         {
             APIMethod.SetCursorPos(x, y);
             APIMethod.mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
         }
-        static void Arknights(int x,int y)
+
+        void DelayAndDisplacement(int dx, int dy, int delay)
         {
-            Thread.Sleep(10000);
-            Program.MoveAndClick(x, y);
-            x -= 372;
-            y += 260;
-            Thread.Sleep(10000);
-            Program.MoveAndClick(x, y);
-            x -= 3;
-            y -= 167;
-            Thread.Sleep(10000);
-            Program.MoveAndClick(x, y);
-            x += 133;
-            y += 97;
-            Thread.Sleep(10000);
+            Thread.Sleep(delay);
+            MoveAndClick(x, y);
+            x += dx;
+            y += dy;
+        }
+
+        void DelayAndRD(int dx,int dy,int delay)
+        {
+            Thread.Sleep(delay);
+            RMAndClick(x, y, R);
+            x += dx;
+            y += dy;
+        }
+
+        void Arknights(int input_x, int input_y)
+        {
+            x = input_x;
+            y = input_y;
+            R = new Random();
+            dx = new int[] { -372, -3, 133, 337, 3, -98, -242 };
+            dy = new int[] { 260, -167, 97, 74, -86, -178, 190 };
+            delay = new int[] { 5000, 5000, 5000, 5000, 5000, 5000, 2 * 60 * 1000 };
             for (int i = 0; i < 3; i++)
             {
-                Program.MoveAndClick(x, y);
-                x += 337;
-                y += 74;
-                Thread.Sleep(10000);
-                //for applying designated mission
-                //Program.MoveAndClick(985, 471);
-                //Thread.Sleep(10000);
-                Program.MoveAndClick(x, y);
-                x += 3;
-                y -= 86;
-                Thread.Sleep(10000);
-                Program.MoveAndClick(x, y);
-                x -= 98;
-                y -= 178;
-                Thread.Sleep(2 * 60 * 1000);
-                Program.MoveAndClick(x, y);
-                x -= 242;
-                y += 190;
+                DelayAndDisplacement(dx[i], dy[i], delay[i]);
+            }
+            for (int i = 0; i < 3; i++)
+            {
+                for(int j = 3; j < 7; j++)
+                {
+                    DelayAndRD(dx[j], dy[j], delay[j]);
+                }
             }
         }
+
         static void Main(string[] args)
         {
+            Program Pr = new Program();
             Console.WriteLine("x:");
             int.TryParse(Console.ReadLine(), out int x);
             Console.WriteLine("y:");
             int.TryParse(Console.ReadLine(), out int y);
-            Program.Arknights(x,y);
+            Pr.Arknights(x,y);
         }
     }
 }
