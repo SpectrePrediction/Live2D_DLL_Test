@@ -340,11 +340,52 @@ namespace LeekCutter
         {
             Color C = new Color();
             POINT P = new POINT();
+            POINT TempP = APIMethod.GetCursorPos();
+            byte Rmin = 255;
+            byte Rmax = 0;
+            byte Gmin = 255;
+            byte Gmax = 0;
+            byte Bmin = 255;
+            byte Bmax = 0;
             while (true)
             {
                 P = APIMethod.GetCursorPos();
+                if (TempP.x != P.x || TempP.y != P.y)
+                {
+                    TempP = P;
+                    Rmin = 255;
+                    Rmax = 0;
+                    Gmin = 255;
+                    Gmax = 0;
+                    Bmin = 255;
+                    Bmax = 0;
+                }
                 C = APIMethod.GetColor(P.x, P.y);
-                Console.WriteLine(C.R + " " + C.G + " " + C.B);
+                if (C.R > Rmax)
+                {
+                    Rmax = C.R;
+                }
+                else if (C.R < Rmin)
+                {
+                    Rmin = C.R;
+                }
+                if (C.G > Gmax)
+                {
+                    Gmax = C.G;
+                }
+                else if (C.G < Gmin)
+                {
+                    Gmin = C.G;
+                }
+                if (C.B > Bmax)
+                {
+                    Bmax = C.B;
+                }
+                else if (C.B < Bmin)
+                {
+                    Bmin = C.B;
+                }
+                Console.WriteLine(C.R + " " + C.G + " " + C.B + " Rmax:" + Rmax + " Rmin:" + Rmin + " Gmax:" + Gmax + " Gmin:" + Gmin + " Bmax:" + Bmax + " Bmin:" + Bmin);
             }
         }
 
@@ -357,8 +398,48 @@ namespace LeekCutter
 
         static void MoveAndClick(int x,int y)
         {
+            Console.WriteLine("x:" + x + " y:" + y);
             APIMethod.SetCursorPos(x, y);
             APIMethod.mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+        }
+
+        static void MatchAndClick(int x, int y)
+        {
+            POINT P = MatchNearestColor(x, y);
+            APIMethod.SetCursorPos(P.x, P.y);
+            APIMethod.mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+        }
+
+        static POINT MatchNearestColor(int input_x,int input_y)
+        {
+            POINT P = new POINT();
+            P.x = input_x;
+            P.y = input_y;
+            int xmax = input_x + 50;
+            int xmin = input_x - 50;
+            int ymax = input_y + 50;
+            int ymin = input_y - 50;
+            bool find = false;
+            Color C = new Color();
+            for(int iter_x = xmin; iter_x < xmax; iter_x++)
+            {
+                for(int iter_y = ymin; iter_y < ymax; iter_y++)
+                {
+                    C = APIMethod.GetColor(iter_x, iter_y);
+                    if (C.R < 147 && C.R > 127 && C.G < 133 && C.G > 112 && C.B < 104 && C.B > 78)
+                    {
+                        P.x = iter_x;
+                        P.y = iter_y;
+                        find = true;
+                        break;
+                    }
+                }
+                if (find)
+                {
+                    break;
+                }
+            }
+            return P;
         }
 
         void DelayAndDisplacement(int dx, int dy, int delay)
@@ -377,22 +458,38 @@ namespace LeekCutter
             y += dy;
         }
 
-        void Arknights(int input_x, int input_y)
+        void Arknights()
         {
-            x = input_x;
-            y = input_y;
+            Console.WriteLine("x:");
+            int.TryParse(Console.ReadLine(), out x);
+            Console.WriteLine(x.ToString());
+            Console.WriteLine("y:");
+            int.TryParse(Console.ReadLine(), out y);
+            Console.WriteLine(y.ToString());
             R = new Random();
             dx = new int[] { -372, -3, 133, 337, 3, -98, -242 };
             dy = new int[] { 260, -167, 97, 74, -86, -178, 190 };
             delay = new int[] { 5000, 5000, 5000, 5000, 5000, 5000, 2 * 60 * 1000 };
             for (int i = 0; i < 3; i++)
             {
-                DelayAndDisplacement(dx[i], dy[i], delay[i]);
+                Console.WriteLine("Click:" + i.ToString());
+                if (i != 1)
+                {
+                    DelayAndDisplacement(dx[i], dy[i], delay[i]);
+                }
+                else
+                {
+                    Thread.Sleep(delay[i]);
+                    MatchAndClick(x, y);
+                    x += dx[i];
+                    y += dy[i];
+                }
             }
             for (int i = 0; i < 3; i++)
             {
                 for(int j = 3; j < 7; j++)
                 {
+                    Console.WriteLine("Click:" + j.ToString());
                     DelayAndRD(dx[j], dy[j], delay[j]);
                 }
             }
@@ -401,11 +498,7 @@ namespace LeekCutter
         static void Main(string[] args)
         {
             Program Pr = new Program();
-            Console.WriteLine("x:");
-            int.TryParse(Console.ReadLine(), out int x);
-            Console.WriteLine("y:");
-            int.TryParse(Console.ReadLine(), out int y);
-            Pr.Arknights(x,y);
+            Pr.Arknights();
         }
     }
 }
