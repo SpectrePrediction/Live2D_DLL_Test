@@ -26,6 +26,12 @@ namespace LeekCutter
         public static extern int SetCursorPos(int x, int y);
 
         [DllImport("user32.dll")]
+        public static extern IntPtr GetDC(IntPtr hwnd);
+
+        [DllImport("gdi32.dll")]
+        public static extern uint GetPixel(IntPtr hdc, int nXPos, int nYPos);
+
+        [DllImport("user32.dll")]
         static extern IntPtr WindowFromPoint(POINT Point);
 
         [DllImport("user32.dll")]
@@ -98,6 +104,14 @@ namespace LeekCutter
         {
             POINT p = GetCursorPos();
             return WindowFromPoint(p);
+        }
+
+        public static Color GetColor(int x, int y)
+        {
+            IntPtr hdc = GetDC(IntPtr.Zero); uint pixel = GetPixel(hdc, x, y);
+            ReleaseDC(IntPtr.Zero, hdc);
+            Color color = Color.FromArgb((int)(pixel & 0x000000FF), (int)(pixel & 0x0000FF00) >> 8, (int)(pixel & 0x00FF0000) >> 16);
+            return color;
         }
 
     }
@@ -282,6 +296,7 @@ namespace LeekCutter
                 APIMethod.keybd_event(vbKeyBack, 0, 2, 0);
             }
         }
+
         static void CursorTest()
         {
             POINT P = APIMethod.GetCursorPos();
@@ -318,6 +333,18 @@ namespace LeekCutter
                     Console.WriteLine(t);
                     p.Dispose();
                 }
+            }
+        }
+
+        static void ColorTest()
+        {
+            Color C = new Color();
+            POINT P = new POINT();
+            while (true)
+            {
+                P = APIMethod.GetCursorPos();
+                C = APIMethod.GetColor(P.x, P.y);
+                Console.WriteLine(C.R + " " + C.G + " " + C.B);
             }
         }
 
